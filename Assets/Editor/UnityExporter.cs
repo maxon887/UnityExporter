@@ -1,8 +1,9 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
-public class UnityExporter : EditorWindow
+public class ExporterWindow : EditorWindow
 {
 	private enum ExportEngine {
 		Cross,
@@ -10,23 +11,22 @@ public class UnityExporter : EditorWindow
 	}
 
 	private ExportEngine export_engine = ExportEngine.Cross;
+	private BaseExporter exporter;
 
 	private string export_folder = "";
 
     [MenuItem("UnityExporter/Export to Cross")]
     public static void ExportToCross() {
-		UnityExporter window = GetWindow<UnityExporter>("Exporter");
+		ExporterWindow window = GetWindow<ExporterWindow>("Exporter");
 		window.titleContent = new GUIContent("Cross Exporter");
-		window.export_engine = ExportEngine.Cross;
-		window.LoadExportFolder();
+		window.InitializeForCross();
 	}
 
 	[MenuItem("UnityExporter/Export to Godot")]
 	public static void ExportToGodot() {
-		UnityExporter window = GetWindow<UnityExporter>("Exporter");
+		ExporterWindow window = GetWindow<ExporterWindow>("Exporter");
 		window.titleContent = new GUIContent("Godot Exporter");
-		window.export_engine = ExportEngine.Godot;
-		window.LoadExportFolder();
+		window.InitializeForGodot();
 	}
 
 	public void OnGUI() {
@@ -48,7 +48,7 @@ public class UnityExporter : EditorWindow
 		EditorGUILayout.EndHorizontal();
 
 		if(GUILayout.Button("Export")) {
-
+			exporter.Export(export_folder);
 		}
 	}
 
@@ -58,21 +58,24 @@ public class UnityExporter : EditorWindow
 		return exportFolder.Replace("\\", "/");
 	}
 
+	private void InitializeForCross() {
+		export_engine = ExportEngine.Cross;
+		exporter = new CrossExporter();
+		export_folder = EditorPrefs.GetString("cross_export_folder", GetDefaultExportFolder());
+	}
+
+	private void InitializeForGodot() {
+		export_engine = ExportEngine.Godot;
+		exporter = new GodotExporter();
+		export_folder = EditorPrefs.GetString("godot_export_folder", GetDefaultExportFolder());
+	}
+
 	private void SaveExportFolder() {
 		if(export_engine == ExportEngine.Cross) {
 			EditorPrefs.SetString("cross_export_folder", export_folder);
 		}
 		if(export_engine == ExportEngine.Godot) {
 			EditorPrefs.SetString("godot_export_folder", export_folder);
-		}
-	}
-
-	private void LoadExportFolder() {
-		if(export_engine == ExportEngine.Cross) {
-			export_folder = EditorPrefs.GetString("cross_export_folder", GetDefaultExportFolder());
-		}
-		if(export_engine == ExportEngine.Godot) {
-			export_folder = EditorPrefs.GetString("godot_export_folder", GetDefaultExportFolder());
 		}
 	}
 }
