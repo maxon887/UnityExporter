@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class ExporterWindow : EditorWindow
@@ -11,7 +10,6 @@ public class ExporterWindow : EditorWindow
 	}
 
 	private ExportEngine export_engine = ExportEngine.Cross;
-	private BaseExporter exporter;
 
 	private string export_folder = "";
 
@@ -48,7 +46,14 @@ public class ExporterWindow : EditorWindow
 		EditorGUILayout.EndHorizontal();
 
 		if(GUILayout.Button("Export")) {
-			exporter.Export(export_folder);
+            if(export_engine == ExportEngine.Cross) {
+                CrossExporter exporter = new CrossExporter();
+                exporter.Export(export_folder);
+            }
+            if(export_engine == ExportEngine.Godot) {
+                GodotExporter exporter = new GodotExporter();
+                exporter.Export(export_folder);
+            }
 		}
 	}
 
@@ -60,13 +65,11 @@ public class ExporterWindow : EditorWindow
 
 	private void InitializeForCross() {
 		export_engine = ExportEngine.Cross;
-		exporter = new CrossExporter();
 		export_folder = EditorPrefs.GetString("cross_export_folder", GetDefaultExportFolder());
 	}
 
 	private void InitializeForGodot() {
 		export_engine = ExportEngine.Godot;
-		exporter = new GodotExporter();
 		export_folder = EditorPrefs.GetString("godot_export_folder", GetDefaultExportFolder());
 	}
 
