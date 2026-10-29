@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -74,11 +75,13 @@ public class ExporterWindow : EditorWindow
 	}
 
 	private void SaveExportFolder() {
-		if(export_engine == ExportEngine.Cross) {
-			EditorPrefs.SetString("cross_export_folder", export_folder);
-		}
-		if(export_engine == ExportEngine.Godot) {
-			EditorPrefs.SetString("godot_export_folder", export_folder);
+		switch(export_engine) {
+			case ExportEngine.Cross:
+				EditorPrefs.SetString("cross_export_folder", export_folder);
+				break;
+			case ExportEngine.Godot:
+				EditorPrefs.SetString("godot_export_folder", export_folder);
+				break;
 		}
 	}
 }

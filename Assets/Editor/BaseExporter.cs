@@ -5,11 +5,12 @@ using UnityEngine;
 public abstract class BaseExporter
 {
     public virtual void Export(string exportFolder) {
-        ExportAllMeshes(exportFolder);
+        ExportAssets(exportFolder, "t:Mesh");
+        ExportAssets(exportFolder, "t:Texture2D");
     }
 
-    private void ExportAllMeshes(string exportFolder) {
-        string[] assetGuids = AssetDatabase.FindAssets("t:Mesh", new []{ "Assets" });
+    private void ExportAssets(string exportFolder, string filter) {
+        string[] assetGuids = AssetDatabase.FindAssets(filter, new []{ "Assets" });
         foreach(string guid in assetGuids) {
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             assetPath = assetPath.Substring("Assets".Length);
