@@ -9,9 +9,11 @@ public class ExporterWindow : EditorWindow
 		Cross,
 		Godot
 	}
-
+	
+	[SerializeField]
 	private ExportEngine export_engine = ExportEngine.Cross;
-
+	
+	[SerializeField]
 	private string export_folder = "";
 
     [MenuItem("UnityExporter/Export to Cross")]
@@ -27,7 +29,7 @@ public class ExporterWindow : EditorWindow
 		window.titleContent = new GUIContent("Godot Exporter");
 		window.InitializeForGodot();
 	}
-
+	
 	public void OnGUI() {
 		EditorGUILayout.BeginHorizontal();
 		string editedFolder = EditorGUILayout.DelayedTextField("Export Folder", export_folder);
@@ -50,10 +52,12 @@ public class ExporterWindow : EditorWindow
             if(export_engine == ExportEngine.Cross) {
                 CrossExporter exporter = new CrossExporter();
                 exporter.Export(export_folder);
+                EditorUtility.DisplayDialog("Cross Export Complete", "Export Succeed", "Ok");
             }
             if(export_engine == ExportEngine.Godot) {
                 GodotExporter exporter = new GodotExporter();
                 exporter.Export(export_folder);
+                EditorUtility.DisplayDialog("Godot Export Complete", "Export Succeed", "Ok");
             }
 		}
 	}
