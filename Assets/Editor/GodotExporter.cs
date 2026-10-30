@@ -25,6 +25,6 @@ public class GodotExporter : BaseExporter
 	}
 
 	private void AddNode(StringBuilder godotScene, string name, string type) {
-		godotScene.AppendLine(string.Format("[node name=\"{0}\" type=\"{1}\"]", name, type));
+		godotScene.AppendLine($"[node name=\"{name}\" type=\"{type}\"]");
 	}
 }
