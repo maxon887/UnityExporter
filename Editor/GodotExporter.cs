@@ -128,6 +128,7 @@ public class GodotExporter : BaseExporter {
 	}
 
 	private static Dictionary<string, string> UnityToGotodShaders = new Dictionary<string, string>();
+	private static String godot_project_file_template_path = "UnityExporter/Templates/project.godot";
 	
 	private HashSet<string> exported_prefabs = new HashSet<string>();
 	private HashSet<string> created_materials = new HashSet<string>();
@@ -136,7 +137,8 @@ public class GodotExporter : BaseExporter {
 	protected override void Export(GameObject[] rootObjects) {
 		project_folder = DetectProjectFolder(export_folder);
 		if(project_folder == "") {
-			throw new Exception("Exporter can not detect project folder");
+			Debug.Log("Project folder not detected. Exporter will create new Godot project");
+			project_folder = CreateProject();
 		}
 		UnityToGotodShaders["Synty/Generic_Basic"] = "StandardMaterial3D";
 		UnityToGotodShaders["Synty/Generic_Basic_Bloody"] = "ShaderMaterial";
@@ -603,9 +605,12 @@ public class GodotExporter : BaseExporter {
 				return result;
 			}
 		}
-
-		string parent = Directory.GetParent(startPath).FullName;
-		return DetectProjectFolder(parent);
+		
+		DirectoryInfo parent = Directory.GetParent(startPath);
+		if(parent == null) {
+			return "";
+		}
+		return DetectProjectFolder(parent.FullName);
 	}
 
 	private string BuildGodotPath(string unityPath) {
@@ -626,5 +631,16 @@ public class GodotExporter : BaseExporter {
 		string parentDirectory = Path.GetDirectoryName(exportPath);
 		Directory.CreateDirectory(parentDirectory);
 		File.WriteAllText(exportPath, data);
+	}
+
+	private string CreateProject() {
+		string projectFolder = export_folder.Replace("\\", "/").TrimEnd('/');
+		string projectName = Path.GetFileName(projectFolder);
+		string templatePath = Application.dataPath + "/" + godot_project_file_template_path;
+		string projectFile = File.ReadAllText(templatePath);
+		projectFile = projectFile.Replace("GodotNewProjectName", projectName);
+		Directory.CreateDirectory(projectFolder);
+		File.WriteAllText(projectFolder + "/project.godot", projectFile);
+		return projectFolder;
 	}
 }
