@@ -59,6 +59,20 @@ public abstract class BaseExporter {
 		return null;
 	}
 
+	protected Color FindMainColor(Material material) {
+		string[] PossibleColorsNames =
+		{
+			"_BaseColor",    // URP/HDRP Lit, Synty
+			"_Color",        // Built-in Standard, Unlit/Color
+		};
+		foreach(string colorName in PossibleColorsNames) {
+			if (material.HasColor(colorName)) {
+				return material.GetColor(colorName);
+			}
+		}
+		return Color.white;
+	}
+
     private void CopyAsset(string asset, string exportFolder) {
 		string assetPath = asset.Substring("Assets".Length);
 	    string destinationPath = exportFolder + assetPath;

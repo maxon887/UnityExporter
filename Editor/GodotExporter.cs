@@ -140,6 +140,7 @@ public class GodotExporter : BaseExporter {
 			Debug.Log("Project folder not detected. Exporter will create new Godot project");
 			project_folder = CreateProject();
 		}
+		UnityToGotodShaders["Standard"] = "StandardMaterial3D";
 		UnityToGotodShaders["Synty/Generic_Basic"] = "StandardMaterial3D";
 		UnityToGotodShaders["Synty/Generic_Basic_Bloody"] = "ShaderMaterial";
 		UnityToGotodShaders["Unlit/Color"] = "StandardMaterial3D";
@@ -197,7 +198,7 @@ public class GodotExporter : BaseExporter {
 		materialBuilder.AppendLine("[gd_resource type=\"" + godotShader + "\" format=3]");
 		materialBuilder.AppendLine();
 
-		if(unityShader == "Synty/Generic_Basic") {
+		if(unityShader == "Synty/Generic_Basic" || unityShader == "Standard") {
 			Texture mainTexture = FindMainTexture(unityMaterial);
 			if(mainTexture) {
 				string unityTexturePath = AssetDatabase.GetAssetPath(mainTexture);
@@ -210,7 +211,7 @@ public class GodotExporter : BaseExporter {
 				materialBuilder.AppendLine("[resource]");
 				materialBuilder.AppendLine("albedo_texture = ExtResource(\"" + mainTextureID + "\")");
 			} else {
-				Color color = unityMaterial.GetColor("_BaseColor");
+				Color color = FindMainColor(unityMaterial);
 				materialBuilder.AppendLine("[resource]");
 				materialBuilder.AppendLine($"albedo_color = Color({color.r}, {color.g}, {color.b}, {color.a})");
 			}
