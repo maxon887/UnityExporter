@@ -310,7 +310,7 @@ public class GodotExporter : BaseExporter {
 						GodotScene.Node editableNode) {
 						
 		GodotScene.Node newNode = new GodotScene.Node(gameObject.name);
-		parent.children.Add(newNode);
+		
 		GameObject source = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
 		//prefab export
 		bool isRootPrefab = PrefabUtility.IsAnyPrefabInstanceRoot(gameObject);
@@ -319,6 +319,10 @@ public class GodotExporter : BaseExporter {
 		// if(PrefabUtility.IsOutermostPrefabInstanceRoot(gameObject)) {
 		if(isRootPrefab) {
 			string prefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(gameObject);
+			if(prefabPath == "") {
+				Debug.LogWarning("Prefab Asset Path not found");
+				return; 
+			}
 			if(prefabType == PrefabAssetType.Regular) {
 				CreateSceneFromPrefab(prefabPath);
 				prefabPath = prefabPath.Replace(".prefab", ".tscn");
@@ -352,6 +356,7 @@ public class GodotExporter : BaseExporter {
 			AddCollisions(godotScene, newNode, gameObject, editableNode);
 		}
 		
+		parent.children.Add(newNode); 
 		if(isRootPrefab) {
 			editableNode = newNode;
 			GodotScene.Node intermediateNode = new GodotScene.Node(source.name);
