@@ -215,6 +215,9 @@ public class GodotExporter : BaseExporter {
 				materialBuilder.AppendLine("[resource]");
 				materialBuilder.AppendLine($"albedo_color = Color({color.r}, {color.g}, {color.b}, {color.a})");
 			}
+			if(unityShader == "Standard") {
+				AddStandardTransparency(unityMaterial, materialBuilder);
+			}
 		}
 
 		if(unityShader == "Synty/Generic_Basic_Bloody") {
@@ -258,6 +261,17 @@ public class GodotExporter : BaseExporter {
 		WriteFile(materialPath, materialBuilder.ToString());
 
 		return materialPath;
+	}
+
+	private void AddStandardTransparency(Material unityMaterial, StringBuilder materialBuilder) {
+		//Unity Standard rendering mode: 0 - Opaque, 1 - Cutout, 2 - Fade, 3 - Transparent
+		int renderingMode = (int)unityMaterial.GetFloat("_Mode");
+		if(renderingMode == 1) {
+			materialBuilder.AppendLine("transparency = 2          ; TRANSPARENCY_ALPHA_SCISSOR");
+			materialBuilder.AppendLine($"alpha_scissor_threshold = {unityMaterial.GetFloat("_Cutoff")}");
+		} else if(renderingMode == 2 || renderingMode == 3) {
+			materialBuilder.AppendLine("transparency = 1          ; TRANSPARENCY_ALPHA");
+		}
 	}
 
 	private void SaveScene(GodotScene godotScene, string assetPath, string sourceExtension) {
